@@ -1,26 +1,93 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-ink: #0a1428;
+  --color-octopus: #4d8eb4;
+  --color-sea: #d6e6f2;
+  --color-coral: #b22c4c;
+  --color-success: #16a34a;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+:root {
+  --header-h: calc(4rem + env(safe-area-inset-top, 0px));
+  --admin-header-h: calc(7rem + env(safe-area-inset-top, 0px));
+}
+
+@media (min-width: 640px) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --admin-header-h: calc(4rem + env(safe-area-inset-top, 0px));
   }
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(900px 420px at 0% -10%, rgba(214, 230, 242, 0.95), transparent 60%),
+    #f4f7fb;
+  color: #0a1428;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.press {
+  transition: transform 0.12s ease;
+}
+
+.press:active {
+  transform: scale(0.97);
+}
+
+@keyframes sheet-up {
+  from {
+    transform: translateY(110%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes pop-in {
+  0% {
+    transform: scale(0.6);
+  }
+  70% {
+    transform: scale(1.12);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes cart-in {
+  from {
+    transform: translateY(120%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-sheet {
+  animation: sheet-up 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.animate-fade {
+  animation: fade-in 0.2s ease;
+}
+
+.animate-pop {
+  animation: pop-in 0.28s ease;
+}
+
+.animate-cart {
+  animation: cart-in 0.34s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
