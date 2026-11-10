@@ -112,7 +112,7 @@ function nextOrderId(localDate: string) {
     .get(prefix.length + 1, `${prefix}%`);
   const maxSeq = asNumber(row?.maxSeq);
   const next = (Number.isFinite(maxSeq) ? maxSeq : 0) + 1;
-  return `${prefix}${String(next).padStart(4, "0")}`;
+  return `${prefix}${String(next).padStart(6, "0")}`;
 }
 
 export type QuotedItem = {
@@ -124,6 +124,7 @@ export type QuotedItem = {
   image: string | null;
   comment?: string;
   options?: { id: string; name: string; qty: number; included: number }[];
+  sourceKey: string;
   spicy: boolean;
   spicyChoice: boolean;
 };
@@ -146,10 +147,10 @@ function mergeQty(
   lines: { productId: string; qty: number; spicy?: boolean; comment?: string; options?: { id: string; qty: number }[] }[],
 ):
   | { ok: false; error: string }
-  | { ok: true; merged: { productId: string; qty: number; spicy: boolean; comment?: string; options?: { id: string; qty: number }[] }[] } {
+  | { ok: true; merged: { productId: string; qty: number; spicy: boolean; comment?: string; options?: { id: string; qty: number }[]; clientKey: string }[] } {
   const merged = new Map<
     string,
-    { productId: string; qty: number; spicy: boolean; comment?: string; options?: { id: string; qty: number }[] }
+    { productId: string; qty: number; spicy: boolean; comment?: string; options?: { id: string; qty: number }[]; clientKey: string }
   >();
   for (const line of lines) {
     if (!line.productId || !Number.isInteger(line.qty) || line.qty < 1) {
@@ -166,6 +167,7 @@ function mergeQty(
       spicy,
       comment: plateComment(line.comment) ?? prev?.comment,
       options: line.options,
+      clientKey: prev?.clientKey ?? key,
     });
   }
   if (merged.size === 0) return { ok: false, error: "Le panier est vide." };
@@ -183,7 +185,7 @@ export function quoteCart(
 
   const folded = new Map<
     string,
-    { productId: string; qty: number; spicy: boolean; comment?: string; options?: { id: string; qty: number }[] }
+    { productId: string; qty: number; spicy: boolean; comment?: string; options?: { id: string; qty: number }[]; clientKey: string }
   >();
   for (const line of merged.merged) {
     const found = findArticle(line.productId);
@@ -199,6 +201,7 @@ export function quoteCart(
       spicy,
       comment: line.comment ?? prev?.comment,
       options: line.options,
+      clientKey: prev?.clientKey ?? line.clientKey,
     });
   }
 
@@ -227,6 +230,7 @@ export function quoteCart(
       image: product.image,
       ...(line.comment ? { comment: line.comment } : {}),
       ...(priced.options.length > 0 ? { options: priced.options } : {}),
+      sourceKey: line.clientKey,
       spicy: spicyChoice && line.spicy,
       spicyChoice,
     });

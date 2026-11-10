@@ -17,6 +17,7 @@ type QuotedLine = {
   unitPrice: number;
   image: string | null;
   options?: PlateChoice[];
+  sourceKey?: string;
   spicy: boolean;
   spicyChoice: boolean;
 };

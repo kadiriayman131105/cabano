@@ -52,3 +52,15 @@ export function takeSlot(key: string, max: number, windowMs: number) {
   db.prepare(`UPDATE login_attempts SET count = count + 1 WHERE key = ?`).run(key);
   return true;
 }
+
+export function releaseSlot(key: string) {
+  const now = Date.now();
+  const db = getDb();
+  const row = db.prepare(`SELECT count, reset_at FROM login_attempts WHERE key = ?`).get(key);
+  if (!row || asNumber(row.reset_at) <= now) return;
+  if (asNumber(row.count) <= 1) {
+    db.prepare(`DELETE FROM login_attempts WHERE key = ?`).run(key);
+    return;
+  }
+  db.prepare(`UPDATE login_attempts SET count = count - 1 WHERE key = ?`).run(key);
+}

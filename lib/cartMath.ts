@@ -13,6 +13,7 @@ type QuotedPlate = {
   productId: string;
   spicy?: boolean;
   options?: { id: string; qty: number }[];
+  sourceKey?: string;
 };
 
 function plateIdentity(line: QuotedPlate) {
@@ -33,10 +34,8 @@ export function assignQuoted<T extends QuotedPlate>(lines: QuotedPlate[], quoted
 
   lines.forEach((line, index) => {
     if (assigned[index]) return;
-    const found = pool.find(
-      (entry) =>
-        !entry.used && entry.item.productId === line.productId && (entry.item.spicy === true) === (line.spicy === true),
-    );
+    const key = plateIdentity(line);
+    const found = pool.find((entry) => !entry.used && entry.item.sourceKey === key);
     if (!found) return;
     found.used = true;
     assigned[index] = found.item;

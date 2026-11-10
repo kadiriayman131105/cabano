@@ -1,7 +1,6 @@
 import { createHmac, randomBytes, timingSafeEqual } from "crypto";
 
 export const LOGIN_GATE_COOKIE = "cabano-gate";
-export const SHARED_LOGIN_KEY = "shared";
 
 function secret() {
   return process.env.ADMIN_SESSION_SECRET ?? "";
@@ -41,6 +40,6 @@ export function loginGateCookieOptions() {
   };
 }
 
-export function loginBucket(gateId: string | null) {
-  return gateId ? `gate:${gateId}` : SHARED_LOGIN_KEY;
+export function loginBucket(gateId: string) {
+  return `gate:${gateId}`;
 }

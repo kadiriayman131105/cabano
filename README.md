@@ -20,7 +20,7 @@ ADMIN_PASSWORD=choisir-un-mot-de-passe
 ADMIN_SESSION_SECRET=une-longue-chaine-aleatoire
 ```
 
-Ce fichier n’est pas versionné. Cinq mots de passe faux bloquent la connexion de ce navigateur pendant 15 minutes.
+Ce fichier n’est pas versionné. Le navigateur doit accepter les cookies : sans eux, la connexion est refusée et ne bloque personne d’autre. Cinq mots de passe faux bloquent ce navigateur pendant 15 minutes.
 
 ## Parcours client
 
@@ -29,9 +29,11 @@ Ce fichier n’est pas versionné. Cinq mots de passe faux bloquent la connexion
 3. Ajouter un plat. S’il a une composition, cocher **Composition** pour retirer un ingrédient ou en ajouter. Retirer un ingrédient inclus ne change pas le prix. Chaque unité en plus ajoute le prix extra fixé sur ce plat.
 4. Dans le panier, écrire un commentaire par plat (épicé, sans oignon, étage). Le commentaire ne change pas le prix.
 5. À la caisse : prénom, nom, téléphone 06 ou 07 sur 10 chiffres, adresse écrite. Un point sur la carte est possible.
-6. La confirmation donne un numéro `CAB-AAAAMMJJ-0001` et un lien secret. Depuis cette page, **Commander à nouveau** remet les mêmes plats dans le panier.
+6. La confirmation donne un numéro `CAB-AAAAMMJJ-000001` et un lien secret. Les commandes déjà passées gardent leur ancien numéro. Depuis cette page, **Commander à nouveau** remet les mêmes plats dans le panier.
 
-Le panier ne mélange pas les deux magasins. Une ligne monte jusqu’à 500 pièces. Le serveur recalcule chaque prix : un montant envoyé par le navigateur est ignoré.
+Le panier ne mélange pas les deux magasins. Une ligne monte jusqu’à 500 pièces. Deux compositions du même plat restent deux lignes, chacune à son prix. Le serveur recalcule chaque prix : un montant envoyé par le navigateur est ignoré.
+
+Quatre commandes enregistrées par téléphone sur 15 minutes, et trente pour l’ensemble des clients sur une minute. Un envoi refusé, parce que le prix a changé ou qu’un plat est out of stock, ne compte pas dans ces limites.
 
 Hors des horaires, le magasin refuse la commande. Ouvert de 12h à 23h, heure de Casablanca, fermé le vendredi.
 
@@ -90,7 +92,7 @@ Le point Casablanca est celui du Google « Snack cabano », Corniche El Hank. Le
 | `/admin` | Commandes |
 | `/admin/carte` | Carte |
 
-Le lien de confirmation ne s’ouvre pas avec le seul numéro `CAB-…`. Il faut le jeton.
+Le lien de confirmation ne s’ouvre pas avec le seul numéro `CAB-…`. Il faut le jeton. Les nouveaux numéros ont six chiffres après la date. Un numéro plus court, déjà donné à un client, continue d’identifier sa commande.
 
 ## Base de données
 

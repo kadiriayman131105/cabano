@@ -14,6 +14,7 @@ type QuoteBody = {
     unitPrice: number;
     image: string | null;
     options?: { id: string; name: string; qty: number; included: number }[];
+    sourceKey?: string;
     spicy: boolean;
     spicyChoice: boolean;
   }[];

@@ -1,7 +1,7 @@
 import { getStore } from "@/data/stores";
 import { CLOSED_MESSAGE, isOpenNow } from "@/lib/hours";
 import { distinctLineError, MAX_DISTINCT_LINES, MAX_LINE_COMMENT, MAX_LINE_QTY, MAX_OPTION_QTY, MAX_OPTIONS } from "@/lib/limits";
-import { takeSlot } from "@/lib/loginLimit";
+import { releaseSlot, takeSlot } from "@/lib/loginLimit";
 import { createOrder } from "@/lib/orderRecords";
 import { z } from "zod";
 
@@ -74,10 +74,15 @@ export async function POST(request: Request) {
   }
 
   const phoneKey = `order:${phone}`;
-  if (
-    !takeSlot(phoneKey, 4, 15 * 60 * 1000) ||
-    !takeSlot("order:global", 30, 60 * 1000)
-  ) {
+  const globalKey = "order:global";
+  if (!takeSlot(phoneKey, 4, 15 * 60 * 1000)) {
+    return Response.json(
+      { error: "Trop de commandes pour le moment. Réessayez dans quelques minutes." },
+      { status: 429 },
+    );
+  }
+  if (!takeSlot(globalKey, 30, 60 * 1000)) {
+    releaseSlot(phoneKey);
     return Response.json(
       { error: "Trop de commandes pour le moment. Réessayez dans quelques minutes." },
       { status: 429 },
@@ -96,6 +101,8 @@ export async function POST(request: Request) {
   });
 
   if ("error" in created) {
+    releaseSlot(phoneKey);
+    releaseSlot(globalKey);
     return Response.json(
       {
         error: created.error,
